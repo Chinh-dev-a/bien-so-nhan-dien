@@ -2,22 +2,24 @@ import cv2
 import numpy as np
 import os
 
-# === 1. Đọc ảnh biển số ===
-img = cv2.imread("plate_crop.jpg")   # ảnh biển số đã cắt
-img=cv2.resize(img,(300,175),interpolation=cv2.INTER_AREA)
-gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+# 1. Đọc ảnh biển số
+img = cv2.imread("bienso/databienso/392_plate1.jpg")   # ảnh biển số đã cắt
+img=cv2.resize(img,(200,150),interpolation=cv2.INTER_AREA) #resize anh
+gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)#chuyen anh sang xam de giam chi tiet
+cv2.imshow('anh chua giam nhieu',gray)
 
 # 2. Tiền xử lý
 # Làm mượt và tăng tương phản
-gray = cv2.bilateralFilter(gray, 9, 75, 75)
-_, thresh = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY_INV)
-# cv2.imshow('anh nhi phan ',thresh)
+gray = cv2.bilateralFilter(gray, 9, 75, 80)
+cv2.imshow('anh da giam nhieu',gray)
+_, thresh = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY_INV)#chuyen anh xam thanh anh nhi phan
+cv2.imshow('anh nhi phan ',thresh)
 
-# === 3. Tìm contour ký tự ===
-contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+# 3. Tìm contour ký tự
+contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)#tim duong cac dung vien contours
 print(contours)
 
-# === 4. Tạo thư mục lưu ===
+# 4. Tạo thư mục lưu
 if not os.path.exists("kytucut"):
     os.mkdir("kytucut")
 
