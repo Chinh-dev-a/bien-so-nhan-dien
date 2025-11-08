@@ -31,64 +31,65 @@ def adjust_gamma(image, gamma=0.8):
 
 # --- HÀM XOAY ẢNH CHÍNH NGHIÊNG (DESKEW) ĐÃ ĐIỀU CHỈNH ---
 # --- HÀM XOAY ẢNH CHÍNH NGHIÊNG (DESKEW) ĐIỀU CHỈNH THEO CÔNG THỨC MỚI ---
-def deskew_image_by_corners(image):
-    coords = cv2.findNonZero(image)
-    if coords is None or len(coords) < 100:
-        M = cv2.getRotationMatrix2D((image.shape[1] // 2, image.shape[0] // 2), 0, 1.0)
-        return image, 0, M
-
-    rect = cv2.minAreaRect(coords)
-    box = cv2.boxPoints(rect) # Lấy 4 đỉnh góc (float)
-    box = np.int0(box)        # Chuyển về int
-
-    # 1. Tìm 2 đỉnh dưới cùng (có tọa độ Y lớn nhất)
-    # Sắp xếp các đỉnh theo tọa độ Y giảm dần (lớn nhất ở đầu)
-    sorted_y = box[np.argsort(box[:, 1])]
-
-    # Hai đỉnh dưới cùng là 2 đỉnh có Y lớn nhất
-    # Ta lấy 2 đỉnh này ra và sắp xếp lại theo X để đảm bảo A luôn là đỉnh bên trái
-    corner_A_B = sorted_y[-2:] # Lấy 2 đỉnh có Y lớn nhất
-    corner_A_B = corner_A_B[np.argsort(corner_A_B[:, 0])] # Sắp xếp theo X
-
-    A = corner_A_B[0] # Đỉnh A (Bên trái, Y lớn)
-    B = corner_A_B[1] # Đỉnh B (Bên phải, Y lớn)
-
-    x1, y1 = A[0], A[1]
-    x2, y2 = B[0], B[1]
-
-    # 2. Tính toán cạnh đối và cạnh kề của tam giác ABC (với C là hình chiếu của A trên trục ngang qua B)
-    # Cạnh đối (độ chênh lệch Y): y_diff = y1 - y2
-    # Cạnh kề (độ chênh lệch X): x_diff = x2 - x1
-
-    y_diff = y1 - y2
-    x_diff = x2 - x1
-
-    # 3. Tính góc quay (Góc alpha)
-    # Sử dụng hàm atan2 để có được góc chính xác trong khoảng [-180, 180]
-    # np.rad2deg chuyển từ radian sang độ
-    angle = np.rad2deg(np.arctan2(y_diff, x_diff))
-
-    # 4. Xoay ảnh theo góc quay đã tính.
-    # Nếu y1 > y2 (A cao hơn B) -> y_diff > 0 -> angle > 0 (xoay ngược chiều kim đồng hồ)
-    # Nếu y1 < y2 (A thấp hơn B) -> y_diff < 0 -> angle < 0 (xoay thuận chiều kim đồng hồ)
-    # Việc tính toán góc đã tự động bao gồm logic "ngược lại điểm A nằm cao hơn điểm B ta cho góc quay âm"
-
-    # Lấy tâm ảnh
-    (h, w) = image.shape[:2]
-    center = (w // 2, h // 2)
-
-    # Ma trận xoay (góc xoay là angle)
-    M = cv2.getRotationMatrix2D(center, angle, 1.0)
-
-    # Áp dụng phép biến đổi affine
-    rotated = cv2.warpAffine(image, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
-
-    # Trả về ảnh đã xoay, góc xoay, VÀ ma trận xoay M
-    return rotated, angle, M
+# def deskew_image_by_corners(image):
+#     coords = cv2.findNonZero(image)
+#     if coords is None or len(coords) < 100:
+#         M = cv2.getRotationMatrix2D((image.shape[1] // 2, image.shape[0] // 2), 0, 1.0)
+#         return image, 0, M
+#
+#     rect = cv2.minAreaRect(coords)
+#     box = cv2.boxPoints(rect) # Lấy 4 đỉnh góc (float)
+#     box = np.int0(box)        # Chuyển về int
+#
+#     # 1. Tìm 2 đỉnh dưới cùng (có tọa độ Y lớn nhất)
+#     # Sắp xếp các đỉnh theo tọa độ Y giảm dần (lớn nhất ở đầu)
+#     sorted_y = box[np.argsort(box[:, 1])]
+#
+#     # Hai đỉnh dưới cùng là 2 đỉnh có Y lớn nhất
+#     # Ta lấy 2 đỉnh này ra và sắp xếp lại theo X để đảm bảo A luôn là đỉnh bên trái
+#     corner_A_B = sorted_y[-2:] # Lấy 2 đỉnh có Y lớn nhất
+#     corner_A_B = corner_A_B[np.argsort(corner_A_B[:, 0])] # Sắp xếp theo X
+#
+#     A = corner_A_B[0] # Đỉnh A (Bên trái, Y lớn)
+#     B = corner_A_B[1] # Đỉnh B (Bên phải, Y lớn)
+#
+#     x1, y1 = A[0], A[1]
+#     x2, y2 = B[0], B[1]
+#
+#     # 2. Tính toán cạnh đối và cạnh kề của tam giác ABC (với C là hình chiếu của A trên trục ngang qua B)
+#     # Cạnh đối (độ chênh lệch Y): y_diff = y1 - y2
+#     # Cạnh kề (độ chênh lệch X): x_diff = x2 - x1
+#
+#     y_diff = y1 - y2
+#     x_diff = x2 - x1
+#
+#     # 3. Tính góc quay (Góc alpha)
+#     # Sử dụng hàm atan2 để có được góc chính xác trong khoảng [-180, 180]
+#     # np.rad2deg chuyển từ radian sang độ
+#     angle = np.rad2deg(np.arctan2(y_diff, x_diff))
+#
+#     # 4. Xoay ảnh theo góc quay đã tính.
+#     # Nếu y1 > y2 (A cao hơn B) -> y_diff > 0 -> angle > 0 (xoay ngược chiều kim đồng hồ)
+#     # Nếu y1 < y2 (A thấp hơn B) -> y_diff < 0 -> angle < 0 (xoay thuận chiều kim đồng hồ)
+#     # Việc tính toán góc đã tự động bao gồm logic "ngược lại điểm A nằm cao hơn điểm B ta cho góc quay âm"
+#
+#     # Lấy tâm ảnh
+#     (h, w) = image.shape[:2]
+#     center = (w // 2, h // 2)
+#
+#     # Ma trận xoay (góc xoay là angle)
+#     M = cv2.getRotationMatrix2D(center, angle, 1.0)
+#
+#     # Áp dụng phép biến đổi affine
+#     rotated = cv2.warpAffine(image, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+#
+#     # Trả về ảnh đã xoay, góc xoay, VÀ ma trận xoay M
+#     return rotated, angle, M
 
 
 # 1. Đọc ảnh biển số
-img_path = "plates/plate_401.jpg"  # Thay bằng đường dẫn ảnh của bạn
+# img_path = "plates/plate_711.jpg"  # Thay bằng đường dẫn ảnh của bạn
+img_path='bienso/databienso/603_plate1.jpg'
 img = cv2.imread(img_path)
 if img is None:
     print(f"Lỗi: Không tìm thấy ảnh tại đường dẫn {img_path}")
@@ -102,7 +103,7 @@ cv2.imshow('Ảnh gốc xám', gray)
 
 # 2. Tiền xử lý
 # 2.1 Giảm chói/Tăng tương phản bằng Gamma
-gray_gamma = adjust_gamma(gray, gamma=0.2)  # Gamma = 0.2 là khá mạnh, có thể thử 0.5-0.8
+gray_gamma = adjust_gamma(gray, gamma=1)  # Gamma = 0.2 là khá mạnh, có thể thử 0.5-0.8
 cv2.imshow('Ảnh giảm chói', gray_gamma)
 
 # 2.2 Giảm nhiễu
@@ -114,18 +115,18 @@ _, thresh_before_skew = cv2.threshold(gray_denoised, 150, 255, cv2.THRESH_BINARY
 cv2.imshow('Ảnh nhị phân (trước xoay)', thresh_before_skew)
 
 # 2.4 XOAY ẢNH CHỈNH NGHIÊNG (DESKEW)
-thresh_rotated, skew_angle, M = deskew_image_by_corners(thresh_before_skew)
+# thresh_rotated, skew_angle, M = deskew_image_by_corners(thresh_before_skew)
 # Áp dụng ma trận xoay M cho ảnh màu kết quả để vẽ contour
-(h, w) = img_result.shape[:2]
-img_result_rotated = cv2.warpAffine(img_result.copy(), M, (w, h), flags=cv2.INTER_CUBIC,
-                                    borderMode=cv2.BORDER_REPLICATE)
+# (h, w) = img_result.shape[:2]
+# img_result_rotated = cv2.warpAffine(img_result.copy(), M, (w, h), flags=cv2.INTER_CUBIC,
+#                                     borderMode=cv2.BORDER_REPLICATE)
 
-cv2.imshow('Ảnh nhị phân (sau xoay)', thresh_rotated)
-cv2.imshow('Ảnh gốc đã xoay thẳng', img_result_rotated)  # Hiển thị ảnh màu đã xoay
-print(f"Đã xoay ảnh một góc: {skew_angle:.2f} độ.")
+# cv2.imshow('Ảnh nhị phân (sau xoay)', thresh_before_skew)
+# cv2.imshow('Ảnh gốc đã xoay thẳng', img_result_rotated)  # Hiển thị ảnh màu đã xoay
+# print(f"Đã xoay ảnh một góc: {skew_angle:.2f} độ.")
 
 # 3. Tìm contour ký tự
-contours, _ = cv2.findContours(thresh_rotated, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+contours, _ = cv2.findContours(thresh_before_skew, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
 # 4. Lọc kích thước cơ bản
 potential_chars = []
@@ -151,7 +152,7 @@ for box1 in potential_chars:
 
 # 6. Sắp xếp theo thứ tự (Trên-Dưới, Trái-Phải)
 final_chars.sort(key=lambda b: b[1])
-H_plate = img_result_rotated.shape[0]
+H_plate = img_result.shape[0]
 Y_mid_point = H_plate / 2
 
 if len(final_chars) > 5 and final_chars[0][1] < Y_mid_point < final_chars[-1][1]:
@@ -176,18 +177,18 @@ if not os.path.exists("kytucut"):
     os.mkdir("kytucut")
 
 for i, (x, y, w, h) in enumerate(sorted_chars):
-    char_img = thresh_rotated[y:y + h, x:x + w]
+    char_img = thresh_before_skew[y:y + h, x:x + w]
     char_img_resized = cv2.resize(char_img, (112, 112), interpolation=cv2.INTER_AREA)
 
     cv2.imwrite(f"kytucut/char_{i + 1}.jpg", char_img_resized)
 
     # Vẽ hộp giới hạn và đánh số thứ tự lên ảnh màu đã xoay
-    cv2.rectangle(img_result_rotated, (x, y), (x + w, y + h), (0, 255, 0), 2)
-    cv2.putText(img_result_rotated, str(i + 1), (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+    cv2.rectangle(img_result, (x, y), (x + w, y + h), (0, 255, 0), 2)
+    cv2.putText(img_result, str(i + 1), (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
 
 print(f"✅ Đã tách và sắp xếp {len(sorted_chars)} ký tự.")
 
 # 8. Hiển thị kết quả
-cv2.imshow("Ky tu tach duoc (Đã xoay & sắp xếp)", img_result_rotated)
+cv2.imshow("Ky tu tach duoc (Đã xoay & sắp xếp)", img_result)
 cv2.waitKey(0)
 cv2.destroyAllWindows()

@@ -7,17 +7,17 @@ from tensorflow.keras.models import load_model
 # 1️⃣ Đường dẫn
 # ================================
 MODEL_PATH = "models/char_cnn_model.h5"   # Mô hình đã train
-TEST_IMG   = 'chudatach/char_12.jpg'     # Ảnh ký tự muốn test
+TEST_IMG   = 'chudatach/char_7.jpg'     # Ảnh ký tự muốn test
 
 # ================================
 # 2️⃣ Định nghĩa class labels (ví dụ)
 # Nếu bạn train 1 chữ hoặc 1 số, điền nhãn đó vào list
 # ================================
-# Ví dụ train các ký tự: 0-9 + A-Z
+# Ví dụ train các ký tự thường gặp
 class_labels = ['0','1','2','3','4','5','6','7','8','9',
-                'A','B','C','D','E','F','G','H','I','J',
-                'K','L','M','N','O','P','Q','R','S','T',
-                'U','V','W','X','Y','Z']
+                'A','B','C','D','E','F','G','H',
+                'K','L','M','N','P','R','T',
+                'U','V','X','Y']
 
 # Nếu bạn train chỉ 1 chữ hoặc 1 số, ví dụ 'E':
 # class_labels = ['E']
@@ -31,17 +31,23 @@ if not os.path.exists(MODEL_PATH):
 model = load_model(MODEL_PATH)
 print("✅ Mô hình đã tải thành công!")
 
+
 # ================================
 # 4️⃣ Load ảnh và chuẩn hóa
 # ================================
 img = cv2.imread(TEST_IMG, cv2.IMREAD_GRAYSCALE)
-# img=cv2.threshold(img,175,255,cv2.THRESH_BINARY_INV)
+
 if img is None:
     raise ValueError("❌ Không đọc được ảnh!")
 
 # Resize về đúng kích thước train
 IMG_SIZE = (32,32)   # phải cùng kích thước với lúc train
 img_resized = cv2.resize(img, IMG_SIZE)
+# img_resized=cv2.cvtColor(img_resized,cv2.COLOR_BGRA2BGR)
+# img_resized=cv2.threshold(img_resized,175,255,cv2.THRESH_BINARY_INV)
+img_resized = cv2.bitwise_not(img_resized)
+cv2.imshow('img dao bit',img_resized)
+
 
 # Chuẩn hóa và reshape
 img_input = img_resized.astype("float32") / 255.0
