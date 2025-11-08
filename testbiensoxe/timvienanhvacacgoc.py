@@ -67,19 +67,20 @@ def main():
     #     cv2.imshow('testelp',output)
     #     cv2.waitKey(0)
     # ret, thresh = cv2.threshold(img, 127, 255, 0)
-    contours, hierarchy = cv2.findContours(thersh, 1, 2)
+    contours, hierarchy = cv2.findContours(thersh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     cnt = contours[0]
     M = cv2.moments(cnt)
     print(M)
     area = cv2.contourArea(cnt)
     perimeter = cv2.arcLength(cnt, True)
-    epsilon = 1 * cv2.arcLength(cnt, True)
+    image_contours = np.zeros(img.shape)
+    epsilon = 0.01 * cv2.arcLength(cnt, True)
     approx = cv2.approxPolyDP(cnt, epsilon, True)
     print("epsilon =",epsilon)
-    cv2.putText(img,approx,)
+    cv2.drawContours(img,perimeter,-1,(0,255,0),2)
 
 
-    cv2.imshow('anh cortour',img)
+    cv2.imshow('anh contour',img)
     cv2.waitKey()
     cv2.destroyAllWindows()
 if __name__ == "__main__":
