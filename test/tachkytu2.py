@@ -5,7 +5,6 @@ import os
 # Ngưỡng chồng lấn (IOU) và Ngưỡng khoảng cách
 IOU_THRESHOLD = 1
 
-
 def get_iou(boxA, boxB):
     # boxA, boxB là (x, y, w, h)
     xA = max(boxA[0], boxB[0])
@@ -32,27 +31,37 @@ def adjust_gamma(image, gamma=0.8):
 
 
 # 1. Đọc ảnh biển số
-img_path = "plates/plate_201.jpg"
+img_path = "plates/plate_172.jpg"
 img = cv2.imread(img_path)
 # if img is None:
 #     print(f"Lỗi: Không tìm thấy ảnh tại đường dẫn {img_path}")
 #     exit()
-
+# kernel = np.ones((3,3),np.uint8)
 img = cv2.resize(img, (400, 250), interpolation=cv2.INTER_AREA)
-img_result = img.copy()
+
+# (h, w, d) = img.shape
+# # tính tâm ảnh
+# center = (w // 2, h // 2)
+# quay ảnh 45 độ tỉ lệ 0.5
+# m = cv2.getRotationMatrix2D(center, -4,1)
+# thực hiện lệnh quay
+# img = cv2.warpAffine(img, m, (w, h))
 
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-cv2.imshow('Ảnh chưa giảm nhiễu', gray)
-
+gray = adjust_gamma(gray, gamma=0.4)
+cv2.imshow('anh xam', gray)
+img_result = img.copy()
 # 2. Tiền xử lý
 gray = cv2.bilateralFilter(gray, 7, 75, 75)
-# Thử với Gamma < 1 để giảm chói
-gray = adjust_gamma(gray, gamma=0.5)
 
-# cv2.imshow("Giam Chói bang Gamma (0.8)", img_fixed)
-cv2.imshow('Ảnh đã giảm nhiễu', gray)
+cv2.imshow('anh da gian nhieu va giam choi', gray)
 _, thresh = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY_INV)
+assert img is not None, "file could not be read, check with os.path.exists()"
+kernel = np.ones((3,3),np.uint8)
+thresh = cv2.erode(thresh,kernel,iterations = 1)
+# thresh = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel)
 cv2.imshow('Ảnh nhị phân', thresh)
+# thresh = cv2.morphologyEx(thresh, cv2.MORPH_TOPHAT, kernel)
 
 # 3. Tìm contour ký tự
 contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)

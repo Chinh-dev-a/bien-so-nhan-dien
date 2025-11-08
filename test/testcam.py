@@ -1,5 +1,15 @@
 import cv2
+import numpy as np
 import os
+
+def adjust_gamma(image, gamma=0.8):
+    # Xây dựng bảng tra cứu (LookUp Table - LUT)
+    invGamma = 1.0 / gamma
+    table = np.array([((i / 255.0) ** invGamma) * 255
+                      for i in np.arange(0, 256)]).astype("uint8")
+
+    # Áp dụng LUT cho ảnh
+    return cv2.LUT(image, table)
 
 # === Đường dẫn video hoặc webcam ===
 video_path = "video/xesang2.mp4"  # 🔹 Thay bằng đường dẫn video của bạn
@@ -29,6 +39,7 @@ while True:
 
     # Chuyển sang grayscale
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    gray = adjust_gamma(gray, gamma=0.5)
 
     # Phát hiện biển số
     plates = plate_cascade.detectMultiScale(
@@ -37,7 +48,7 @@ while True:
 
     for (x, y, w, h) in plates:
         # Vẽ khung quanh biển số
-        # cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
         cv2.putText(frame, "BIEN SO XE", (x, y - 10),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
 

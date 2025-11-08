@@ -38,6 +38,7 @@ if largest_rectangle[0] != 0:
     # Lấy tọa độ hình chữ nhật
     x, y, w, h = cv2.boundingRect(largest_rectangle[1])
 
+
     # Cắt vùng biển số
     roi = img[y:y + h, x:x + w]
 
