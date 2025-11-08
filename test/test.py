@@ -4,7 +4,7 @@ from PIL import Image
 import matplotlib.pyplot as plt
 
 # Đọc ảnh
-img = cv2.imread('plates/plate_203.jpg')
+img = cv2.imread('datatestbienso/1042.jpg')
 # 🔹 Thay bằng đường dẫn ảnh biển số
 
 # Chuyển sang ảnh xám
@@ -42,7 +42,7 @@ if largest_rectangle[0] != 0:
     roi = img[y:y + h, x:x + w]
 
     # Vẽ khung lên ảnh gốc
-    cv2.drawContours(img, [largest_rectangle[1]], -1, (0, 255, 0), 3)
+    cv2.drawContours(img, [largest_rectangle[1]], -1, (0, 255, 0), 1)
 
     # Hiển thị kết quả
     cv2.imshow('Vung bien so', roi)
