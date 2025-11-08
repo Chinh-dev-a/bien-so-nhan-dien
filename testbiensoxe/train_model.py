@@ -15,7 +15,7 @@ TEST_DIR  = "datatest"    # Folder chứa ảnh test
 # ================================
 # 2️⃣ CẤU HÌNH CNN
 # ================================
-IMG_SIZE = (32, 32)
+IMG_SIZE = (112, 112)
 BATCH_SIZE = 16
 EPOCHS = 15
 

@@ -35,12 +35,13 @@ print("✅ Mô hình đã tải thành công!")
 # 4️⃣ Load ảnh và chuẩn hóa
 # ================================
 img = cv2.imread(TEST_IMG, cv2.IMREAD_GRAYSCALE)
+# img=cv2.cvtColor(img,cv2.COLOR_BGRA2BGR)
 # img=cv2.threshold(img,175,255,cv2.THRESH_BINARY_INV)
 if img is None:
     raise ValueError("❌ Không đọc được ảnh!")
 
 # Resize về đúng kích thước train
-IMG_SIZE = (32,32)   # phải cùng kích thước với lúc train
+IMG_SIZE = (112,112)   # phải cùng kích thước với lúc train
 img_resized = cv2.resize(img, IMG_SIZE)
 
 # Chuẩn hóa và reshape
