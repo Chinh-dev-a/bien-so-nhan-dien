@@ -2,7 +2,7 @@ import cv2
 import os
 
 # === Đường dẫn video hoặc webcam ===
-video_path = "video/xetoi.mp4"  # 🔹 Thay bằng đường dẫn video của bạn
+video_path = "video/xesang2.mp4"  # 🔹 Thay bằng đường dẫn video của bạn
 # Nếu muốn dùng webcam thì đổi thành video_path = 0
 
 # === Nạp bộ cascade phát hiện biển số ===

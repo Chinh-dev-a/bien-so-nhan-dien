@@ -3,7 +3,7 @@ import numpy as np
 import os
 
 # Ngưỡng chồng lấn (IOU) và Ngưỡng khoảng cách
-IOU_THRESHOLD = 0.5
+IOU_THRESHOLD = 1
 
 
 def get_iou(boxA, boxB):
@@ -19,21 +19,37 @@ def get_iou(boxA, boxB):
     return iou
 
 
-# 1. Đọc ảnh biển số
-img_path = "bienso/databienso/392_plate1.jpg"
-img = cv2.imread(img_path)
-if img is None:
-    print(f"Lỗi: Không tìm thấy ảnh tại đường dẫn {img_path}")
-    exit()
+def adjust_gamma(image, gamma=0.8):
+    # Xây dựng bảng tra cứu (LookUp Table - LUT)
+    invGamma = 1.0 / gamma
+    table = np.array([((i / 255.0) ** invGamma) * 255
+                      for i in np.arange(0, 256)]).astype("uint8")
 
-img = cv2.resize(img, (200, 150), interpolation=cv2.INTER_AREA)
+    # Áp dụng LUT cho ảnh
+    return cv2.LUT(image, table)
+
+
+
+
+# 1. Đọc ảnh biển số
+img_path = "plates/plate_201.jpg"
+img = cv2.imread(img_path)
+# if img is None:
+#     print(f"Lỗi: Không tìm thấy ảnh tại đường dẫn {img_path}")
+#     exit()
+
+img = cv2.resize(img, (400, 250), interpolation=cv2.INTER_AREA)
 img_result = img.copy()
 
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 cv2.imshow('Ảnh chưa giảm nhiễu', gray)
 
 # 2. Tiền xử lý
-gray = cv2.bilateralFilter(gray, 9, 75, 80)
+gray = cv2.bilateralFilter(gray, 7, 75, 75)
+# Thử với Gamma < 1 để giảm chói
+gray = adjust_gamma(gray, gamma=0.5)
+
+# cv2.imshow("Giam Chói bang Gamma (0.8)", img_fixed)
 cv2.imshow('Ảnh đã giảm nhiễu', gray)
 _, thresh = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY_INV)
 cv2.imshow('Ảnh nhị phân', thresh)

@@ -3,7 +3,7 @@ import numpy as np
 import os
 
 # 1. Đọc ảnh biển số
-img = cv2.imread("bienso/databienso/392_plate1.jpg")   # ảnh biển số đã cắt
+img = cv2.imread("bienso/databienso/803_plate1.jpg")   # ảnh biển số đã cắt
 img=cv2.resize(img,(200,150),interpolation=cv2.INTER_AREA) #resize anh
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)#chuyen anh sang xam de giam chi tiet
 cv2.imshow('anh chua giam nhieu',gray)
