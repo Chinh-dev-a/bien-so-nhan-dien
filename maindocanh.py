@@ -8,7 +8,7 @@ from filedocmodel import docbien
 def main():
     # Đường dẫn
     plate_cascade = cv2.CascadeClassifier('cascade2.xml')
-    IMAGE_PATH = 'test/datatestbienso/427.jpg'   # 👉 Thay đường dẫn ảnh của bạn tại đây
+    IMAGE_PATH = 'test/datatestbienso/781.jpg'   # 👉 Thay đường dẫn ảnh của bạn tại đây
     MODEL_PATH = "models/char_cnn_model.h5"
     folder = 'kytucut'
     class_labels = ['0','1','2','3','4','5','6','7','8','9',

@@ -3,7 +3,7 @@ import os
 from tensorflow.keras.models import load_model
 
 from test import timbienso        # Hàm phát hiện vùng biển số (trả về ảnh biển số + check)
-from tachchar import tachkytu     # Hàm tách ký tự
+from tachkytu import tachkytu     # Hàm tách ký tự
 from testread import docbien      # Hàm đọc ký tự và ghép chuỗi biển số
 
 
@@ -60,27 +60,33 @@ def main():
 
         if check is True :
             # Tách ký tự
-            tachkytu(bienso)
+            kytu=tachkytu(bienso)
+            Text = ""
 
             # Nhận dạng ký tự
-            text = docbien(model, class_labels)
+            # text = docbien(model, class_labels,)
+            plate_number = ""
+            for i, char_img in enumerate(kytu):
+                label = docbien(model, class_labels, char_img)
+                plate_number += label
+                print(f"Ký tự {i + 1}: {label}")
 
             # Ghi kết quả lên ảnh
-            cv2.putText(frame, text, (10, 30),
+            cv2.putText(frame, plate_number, (10, 30),
                         cv2.FONT_HERSHEY_SIMPLEX,
                         1, (0, 255, 255), 2, cv2.LINE_AA)
 
-            # Xóa file tạm trong thư mục
-            for filename in os.listdir(folder):
-                file_path = os.path.join(folder, filename)
-                if os.path.isfile(file_path):
-                    os.remove(file_path)
+            # # Xóa file tạm trong thư mục
+            # for filename in os.listdir(folder):
+            #     file_path = os.path.join(folder, filename)
+            #     if os.path.isfile(file_path):
+            #         os.remove(file_path)
 
         # Hiển thị video
         cv2.imshow("Nhan dien bien so", frame)
 
         # Nhấn 'q' để thoát
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+        if cv2.waitKey(500) & 0xFF == ord('q'):
             break
 
     # ================================

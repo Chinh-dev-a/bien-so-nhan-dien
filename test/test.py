@@ -107,8 +107,6 @@ def timbienso(image,plate_cascade):
         cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
         cv2.putText(image, "BIEN SO XE", (x, y - 10),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-
-        # Cắt và lưu biển số
         plate_crop = image[y:y+h, x:x+w]
         # if plate_crop.size > 0:
         #     plate_filename = os.path.join(save_dir, f"plate_{plate_count}.jpg")

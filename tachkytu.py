@@ -18,7 +18,7 @@ def get_iou(boxA, boxB):
     iou = interArea / unionArea
     return iou
 
-def adjust_gamma(image, gamma=0.8):
+def adjust_gamma(image, gamma):
     invGamma = 1.0 / gamma
     table = np.array([((i / 255.0) ** invGamma) * 255
                       for i in np.arange(0, 256)]).astype("uint8")
@@ -26,15 +26,15 @@ def adjust_gamma(image, gamma=0.8):
 
 def tachkytu(img):
     img = cv2.resize(img, (400, 250), interpolation=cv2.INTER_AREA)#resize anh
-    img=adjust_gamma(img,1)
+    img=adjust_gamma(img,0.6)
     img_result = img.copy()
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)#chuyen anh sang xam
     gray_denoised = cv2.bilateralFilter(gray, 7, 75, 75)
-    _, thresh_before_skew = cv2.threshold(gray_denoised, 150, 255, cv2.THRESH_BINARY_INV)
-    kernel = np.ones((5, 5), np.uint8)
-    thresh_before_skew = cv2.erode(thresh_before_skew, kernel, iterations=1)
-    cv2.imshow('anh xu ly tach ky tu ni phan',thresh_before_skew)
-    contours, _ = cv2.findContours(thresh_before_skew, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    _, thresh = cv2.threshold(gray_denoised, 150, 255, cv2.THRESH_BINARY_INV)
+    kernel = np.ones((3, 3), np.uint8)
+    thresh = cv2.erode(thresh, kernel, iterations=1)
+    cv2.imshow('anh xu ly tach ky tu nhi phan',thresh)
+    contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     potential_chars = []
     for c in contours:
@@ -77,15 +77,15 @@ def tachkytu(img):
         os.mkdir("kytucut")
 
     for i, (x, y, w, h) in enumerate(sorted_chars):
-        x-=10
-        y-=10
-        h+=15
-        w+=15
-        char_img = thresh_before_skew[y:y + h, x:x + w]
+        # x-=10
+        # y-=10
+        # h+=15
+        # w+=15
+        char_img = thresh[y:y + h, x:x + w]
         char_img_resized = cv2.resize(char_img, (112, 112), interpolation=cv2.INTER_AREA)
         cv2.imwrite(f"kytucut/char_{i + 1}.jpg", char_img_resized)
         cv2.rectangle(img_result, (x, y), (x + w, y + h), (0, 255, 0), 2)
         cv2.putText(img_result, str(i + 1), (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-    cv2.imshow('anh xu ly tach ky tu ni phan', thresh_before_skew)
+    cv2.imshow('anh xu ly tach ky tu ni phan', thresh)
     cv2.imshow('anh cat ky tu bien so',img_result)
     print(f"✅ Đã tách và sắp xếp {len(sorted_chars)} ký tự.")

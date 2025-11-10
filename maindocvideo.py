@@ -1,13 +1,15 @@
 import cv2
 import os
 from tensorflow.keras.models import load_model
+
+
 from nhandienbienso import timbienso
 from tachkytu import tachkytu
 from filedocmodel import docbien
 
 def main():
     plate_cascade = cv2.CascadeClassifier('cascade2.xml')
-    cap = cv2.VideoCapture('test/video/VideoTest.mp4')
+    cap = cv2.VideoCapture('test/video/xesang2.mp4')
     MODEL_PATH = "models/char_cnn_model.h5"
     folder = 'kytucut'
     class_labels = ['0','1','2','3','4','5','6','7','8','9',
