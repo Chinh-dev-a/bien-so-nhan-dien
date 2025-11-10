@@ -17,7 +17,7 @@ def main():
     # 2️⃣ Chọn nguồn video
     # ================================
     # cap = cv2.VideoCapture(0)  # webcam
-    cap = cv2.VideoCapture("video/cv2 (1).mp4")
+    cap = cv2.VideoCapture('video/VideoTest.mp4')
 
     MODEL_PATH = "models/char_cnn_model.h5"   # Mô hình CNN
     folder = 'kytucut'                        # Thư mục tạm chứa ký tự tách
@@ -68,7 +68,7 @@ def main():
             # Ghi kết quả lên ảnh
             cv2.putText(frame, text, (10, 30),
                         cv2.FONT_HERSHEY_SIMPLEX,
-                        1, (0, 0, 255), 2, cv2.LINE_AA)
+                        1, (0, 255, 255), 2, cv2.LINE_AA)
 
             # Xóa file tạm trong thư mục
             for filename in os.listdir(folder):

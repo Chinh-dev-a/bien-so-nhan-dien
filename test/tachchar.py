@@ -273,7 +273,7 @@ def  tachkytu(img):
 
     # 2.3 Ngưỡng hóa nhị phân
     _, thresh_before_skew = cv2.threshold(gray_denoised, 150, 255, cv2.THRESH_BINARY_INV)
-    # cv2.imshow('Ảnh nhị phân (trước xoay)', thresh_before_skew)
+    cv2.imshow('Ảnh nhị phân (trước xoay)', thresh_before_skew)
     kernel = np.ones((5, 5), np.uint8)
     thresh_before_skew = cv2.erode(thresh_before_skew, kernel, iterations=1)
 
