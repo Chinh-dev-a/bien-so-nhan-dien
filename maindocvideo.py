@@ -32,7 +32,7 @@ def docbien(model, char_img, class_labels):
 
 
 def timbienso(image, plate_cascade):
-    #Phát hiện biển số trong khung hình (frame) bằng Haar Cascade.
+    #Phát hiện biển số trong khung hình (frame) bằng HaarCascade.
     # Chuyển đổi sang ảnh grayscale để phát hiện
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     plates = plate_cascade.detectMultiScale(
