@@ -11,8 +11,7 @@ def docbien(model, char_img, class_labels):
         img = char_img
 
     # 2. Resize theo đúng model bạn đang dùng (32×32)
-    IMG_SIZE = (32, 32)
-    img_resized = cv2.resize(img, IMG_SIZE)
+    img_resized = cv2.resize(img, (32, 32))
 
     # 3. Invert để giống lúc bạn train (trắng = nét)
     img_resized = cv2.bitwise_not(img_resized)
@@ -58,12 +57,10 @@ def timbienso(image, plate_cascade):
 
 
 def main():
-    # Khởi tạo Haar Cascade cho biển số xe
+    # Khởi tạo HaarCascade cho biển số xe
     plate_cascade = cv2.CascadeClassifier('cascade2.xml')
-    # Thay đổi từ đường dẫn ảnh sang 0 cho webcam hoặc đường dẫn file video
-    # VIDEO_SOURCE = 0  # Sử dụng webcam mặc định
-    VIDEO_SOURCE = "test/video/VideoTest.mp4"  # Thay thế bằng đường dẫn đến file video của bạn
-
+    # VIDEO_SOURCE = 0  # Cam may tinh
+    VIDEO_SOURCE = "test/video/VideoTest.mp4"  # Đường dẫn video
     MODEL_PATH = "models/char_cnn_model.h5"
 
     class_labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',

@@ -1,6 +1,4 @@
 import os
-import cv2
-import numpy as np
 from tensorflow.keras import layers, models
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
