@@ -1,203 +1,81 @@
-# import cv2
-# import os
-# from tensorflow.keras.models import load_model
-#
-# from tachkytu import tachkytu
-# from filedocmodel import docbien
-#
-# def timbienso(image, plate_cascade):
-#     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-#     # _, thresh = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY_INV)
-#     cv2.imshow('test',gray)
-#     plates = plate_cascade.detectMultiScale(
-#         gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30)
-#     )
-#
-#     for (x, y, w, h) in plates:
-#         cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
-#         cv2.putText(image, "BIEN SO XE", (x, y - 10),
-#                     cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-#
-#         plate_crop = image[y:y + h, x:x + w]
-#
-#     if len(plates) == 0:
-#         print(" Không phát hiện được biển số nào trong ảnh.")
-#         checks = False
-#         plate_crop = 0
-#     else:
-#         print(" Phát hiện biển số trong ảnh.")
-#         checks = True
-#
-#     return plate_crop, checks
-#
-# def main():
-#     plate_cascade = cv2.CascadeClassifier('cascade2.xml')
-#     cap = cv2.VideoCapture('test/video/VideoTest.mp4')
-#     MODEL_PATH = "models/char_cnn_model.h5"
-#     folder = 'kytucut'
-#     class_labels = ['0','1','2','3','4','5','6','7','8','9',
-#                     'A','B','C','D','E','F','G','H',
-#                     'K','L','M','N','P','R','S','T',
-#                     'U','V','X','Y']
-#
-#     if not os.path.exists(MODEL_PATH):
-#         raise FileNotFoundError(f" Không tìm thấy mô hình: {MODEL_PATH}")
-#
-#     model = load_model(MODEL_PATH)
-#     print(" Mô hình đã tải thành công!")
-#
-#     if not cap.isOpened():
-#         print(" Không mở được video hoặc webcam!")
-#         return
-#
-#     while True:
-#         ret, frame = cap.read()
-#         if not ret:
-#             print("Video kết thúc hoặc không đọc được khung hình.")
-#             break
-#
-#         bienso, check = timbienso(frame, plate_cascade)
-#         if check is True:
-#             tachkytu(bienso)
-#             text = docbien(model, class_labels)
-#             cv2.putText(frame, text, (10, 30),
-#                         cv2.FONT_HERSHEY_SIMPLEX,
-#                         1, (0, 255, 255), 2, cv2.LINE_AA)
-#
-#             for filename in os.listdir(folder):
-#                 file_path = os.path.join(folder, filename)
-#                 if os.path.isfile(file_path):
-#                     os.remove(file_path)
-#
-#         cv2.imshow("Nhan dien bien so", frame)
-#
-#         if cv2.waitKey(1) & 0xFF == ord('q'):
-#             break
-#
-#     cap.release()
-#     cv2.destroyAllWindows()
-#
-# if __name__ == "__main__":
-#     main()
-#check ok
-######################################################
 import cv2
 import os
 from tensorflow.keras.models import load_model
+
 from tachkytu import tachkytu
 from filedocmodel import docbien
 
-
 def timbienso(image, plate_cascade):
-    #Phát hiện biển số trong khung hình (frame) bằng Haar Cascade.
-    # Chuyển đổi sang ảnh grayscale để phát hiện
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    # _, thresh = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY_INV)
+    cv2.imshow('test',gray)
     plates = plate_cascade.detectMultiScale(
         gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30)
     )
 
-    # Khởi tạo mặc định
-    plate_crop = None
-    check = False
-
-    # Chỉ xử lý biển số đầu tiên được tìm thấy (nếu có nhiều biển số)
     for (x, y, w, h) in plates:
         cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
         cv2.putText(image, "BIEN SO XE", (x, y - 10),
                     cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
-        # Cắt vùng chứa biển số
         plate_crop = image[y:y + h, x:x + w]
-        check = True
-        break  # Phát hiện và xử lý biển số đầu tiên, sau đó thoát khỏi vòng lặp
 
-    return plate_crop, check
+    if len(plates) == 0:
+        print(" Không phát hiện được biển số nào trong ảnh.")
+        checks = False
+        plate_crop = 0
+    else:
+        print(" Phát hiện biển số trong ảnh.")
+        checks = True
 
+    return plate_crop, checks
 
 def main():
-    # Khởi tạo Haar Cascade cho biển số xe
     plate_cascade = cv2.CascadeClassifier('cascade2.xml')
-    # Thay đổi từ đường dẫn ảnh sang 0 cho webcam hoặc đường dẫn file video
-    # VIDEO_SOURCE = 0  # Sử dụng webcam mặc định
-    VIDEO_SOURCE = "test/video/VideoTest.mp4"  # Thay thế bằng đường dẫn đến file video của bạn
+    cap = cv2.VideoCapture('test/video/VideoTest.mp4')
+    MODEL_PATH = "testbiensoxe/models/char_cnn_model.h5"
+    folder = 'kytucut'
+    class_labels = ['0','1','2','3','4','5','6','7','8','9',
+                    'A','B','C','D','E','F','G','H',
+                    'K','L','M','N','P','R','T',
+                    'U','V','X','Y']
 
-    MODEL_PATH = "models/char_cnn_model.h5"
+    if not os.path.exists(MODEL_PATH):
+        raise FileNotFoundError(f" Không tìm thấy mô hình: {MODEL_PATH}")
 
-    class_labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-                    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
-                    'K', 'L', 'M', 'N', 'P', 'R', 'T',
-                    'U', 'V', 'X', 'Y']
-
-    # Tải mô hình CNN
-    try:
-        model = load_model(MODEL_PATH)
-        print("✔ Đã tải mô hình CNN!")
-    except Exception as e:
-        print(f"Lỗi khi tải mô hình: {e}")
-        return
-
-    # Khởi tạo đối tượng đọc video
-    cap = cv2.VideoCapture(VIDEO_SOURCE)
+    model = load_model(MODEL_PATH)
+    print(" Mô hình đã tải thành công!")
 
     if not cap.isOpened():
-        print(f"Không thể mở nguồn video: {VIDEO_SOURCE}")
+        print(" Không mở được video hoặc webcam!")
         return
 
-    print("Bắt đầu xử lý video...")
-
-    # Bắt đầu vòng lặp xử lý từng khung hình
     while True:
-        # Đọc từng khung hình
         ret, frame = cap.read()
-
-        # Kiểm tra xem khung hình có được đọc thành công không
         if not ret:
-            print("Đã hết video hoặc không thể đọc khung hình.")
+            print("Video kết thúc hoặc không đọc được khung hình.")
             break
 
-        # Sao chép khung hình để hiển thị kết quả
-        display_frame = frame.copy()
+        bienso, check = timbienso(frame, plate_cascade)
+        if check is True:
+            tachkytu(bienso)
+            text = docbien(model, class_labels)
+            cv2.putText(frame, text, (10, 30),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        1, (0, 255, 255), 2, cv2.LINE_AA)
 
-        # Phát hiện và cắt biển số
-        bienso, check = timbienso(display_frame, plate_cascade)
-        plate_number = ""
+            for filename in os.listdir(folder):
+                file_path = os.path.join(folder, filename)
+                if os.path.isfile(file_path):
+                    os.remove(file_path)
 
-        if check and bienso is not None:
-            try:
-                # Tách ký tự (giả định hàm tachkytu đã được định nghĩa đúng)
-                kytu = tachkytu(bienso)
+        cv2.imshow("Nhan dien bien so", frame)
 
-                # Nhận diện từng ký tự
-                for i, char_img in enumerate(kytu):
-                    label = docbien(model, char_img, class_labels)
-                    plate_number += label
-
-                # In và hiển thị kết quả nhận diện
-                print("Biển số nhận được:", plate_number)
-
-                cv2.putText(display_frame, plate_number, (10, 30),
-                            cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
-
-            except Exception as e:
-                print(f"Lỗi trong quá trình nhận diện ký tự: {e}")
-                cv2.putText(display_frame, "Loi Nhan Dien", (10, 30),
-                            cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-        else:
-            cv2.putText(display_frame, "Khong phat hien bien so", (10, 30),
-                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-
-        # Hiển thị khung hình
-        cv2.imshow("Nhan dien bien so tu Video", display_frame)
-
-        # Thoát vòng lặp khi nhấn phím 'q'
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
-    # Giải phóng đối tượng đọc video và đóng tất cả cửa sổ
     cap.release()
     cv2.destroyAllWindows()
 
-
 if __name__ == "__main__":
     main()
-
