@@ -1,9 +1,34 @@
-
 import cv2
-import os
+import numpy as np
 from tensorflow.keras.models import load_model
 from tachkytu import tachkytu
-from filedocmodel import docbien
+
+def docbien(model, char_img, class_labels):
+    # 1. Nếu ảnh đang là BGR → convert sang GRAY
+    if len(char_img.shape) == 3:
+        img = cv2.cvtColor(char_img, cv2.COLOR_BGR2GRAY)
+    else:
+        img = char_img
+
+    # 2. Resize theo đúng model bạn đang dùng (32×32)
+    IMG_SIZE = (32, 32)
+    img_resized = cv2.resize(img, IMG_SIZE)
+
+    # 3. Invert để giống lúc bạn train (trắng = nét)
+    img_resized = cv2.bitwise_not(img_resized)
+
+    # 4. Normalized
+    img_input = img_resized.astype("float32") / 255.0
+
+    # 5. Expand cho đúng shape (1, 32, 32, 1)
+    img_input = np.expand_dims(img_input, axis=(0, -1))
+
+    # 6. Predict
+    pred = model.predict(img_input, verbose=0)
+    pred_idx = np.argmax(pred, axis=1)[0]
+
+    # 7. Trả về nhãn ký tự
+    return class_labels[pred_idx]
 
 
 def timbienso(image, plate_cascade):
@@ -49,7 +74,7 @@ def main():
     # Tải mô hình CNN
     try:
         model = load_model(MODEL_PATH)
-        print("✔ Đã tải mô hình CNN!")
+        print("Đã tải mô hình CNN!")
     except Exception as e:
         print(f"Lỗi khi tải mô hình: {e}")
         return
@@ -81,7 +106,6 @@ def main():
         plate_number = ""
 
         if check and bienso is not None:
-            try:
                 # Tách ký tự (giả định hàm tachkytu đã được định nghĩa đúng)
                 kytu = tachkytu(bienso)
 
@@ -95,11 +119,6 @@ def main():
 
                 cv2.putText(display_frame, plate_number, (10, 30),
                             cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
-
-            except Exception as e:
-                print(f"Lỗi trong quá trình nhận diện ký tự: {e}")
-                cv2.putText(display_frame, "Loi Nhan Dien", (10, 30),
-                            cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
         else:
             cv2.putText(display_frame, "Khong phat hien bien so", (10, 30),
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
