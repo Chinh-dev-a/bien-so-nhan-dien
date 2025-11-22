@@ -7,16 +7,11 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 TRAIN_DIR = "testbiensoxe/datatrain"
 TEST_DIR = "testbiensoxe/datatest"
 
-# ================================
-# 1️⃣ CẤU HÌNH CNN SIZE 32×32
-# ================================
+# 1️. CẤU HÌNH CNN SIZE 32×32
 IMG_SIZE = (32, 32)
 BATCH_SIZE = 16
 EPOCHS = 15
-
-# ================================
-# 2️⃣ TẠO DATA GENERATOR
-# ================================
+# 2️. TẠO DATA GENERATOR
 train_datagen = ImageDataGenerator(
     rescale=1./255,
     rotation_range=5,
@@ -44,10 +39,7 @@ test_gen = test_datagen.flow_from_directory(
     batch_size=BATCH_SIZE,
     class_mode="categorical"
 )
-
-# ================================
-# 3️⃣ XÂY DỰNG CNN INPUT 32×32×1
-# ================================
+# 3️. XÂY DỰNG CNN INPUT 32×32×1
 model = models.Sequential([
     layers.Conv2D(32, (3, 3), activation='relu',input_shape=(IMG_SIZE[0], IMG_SIZE[1], 1)),
     layers.MaxPooling2D((2, 2)),
@@ -68,25 +60,16 @@ model = models.Sequential([
 model.compile(optimizer='adam',
               loss='categorical_crossentropy',
               metrics=['accuracy'])
-
-# ================================
-# 4️⃣ HUẤN LUYỆN
-# ================================
+# 4️. HUẤN LUYỆN
 print("\n Bắt đầu huấn luyện mô hình...\n")
 history = model.fit(train_gen, epochs=EPOCHS, validation_data=test_gen)
-
-# ================================
-# 5️⃣ LƯU MODEL
-# ================================
+# 5️. LƯU MODEL
 os.makedirs("models", exist_ok=True)
 MODEL_PATH = "models/char_cnn_model.h5"
 model.save(MODEL_PATH)
 
 print(f"\n✅ Đã lưu mô hình tại: {MODEL_PATH}")
-
-# ================================
-# 6️⃣ IN CLASS INDEX
-# ================================
+# 6️. IN CLASS INDEX
 class_indices = train_gen.class_indices
 print("\nSố lớp:", train_gen.num_classes)
 print("Các lớp:", list(class_indices.keys()))
