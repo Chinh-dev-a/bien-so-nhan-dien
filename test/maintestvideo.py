@@ -3,7 +3,7 @@ import os
 from tensorflow.keras.models import load_model
 
 from test import timbienso        # Hàm phát hiện vùng biển số (trả về ảnh biển số + check)
-from tachkytu import tachkytu     # Hàm tách ký tự
+from tachkytu1 import tachkytu     # Hàm tách ký tự
 from testread import docbien      # Hàm đọc ký tự và ghép chuỗi biển số
 
 
