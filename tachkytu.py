@@ -331,11 +331,7 @@ def tachkytu(img):
 
     return chars_list
 #check ok
-#
-#
-# # ==============================
-# # Test nhanh
-# # ==============================
+
 if __name__ == "__main__":
     img=cv2.imread("test/bienso/databienso/214_plate1.jpg")
     chars = tachkytu(img)
