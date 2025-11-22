@@ -148,7 +148,7 @@ model = models.Sequential([
 
     layers.Flatten(),
     layers.Dense(256, activation='relu'),
-    layers.Dropout(0.2),
+    layers.Dropout(0.5),
     layers.Dense(train_gen.num_classes, activation='softmax')
 ])
 

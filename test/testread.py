@@ -86,15 +86,8 @@ import cv2
 import numpy as np
 
 def docbien(model, class_labels, img):
-    """
-    Dự đoán 1 ký tự biển số từ ảnh đầu vào.
-    ---
-    model: mô hình CNN đã load sẵn.
-    class_labels: danh sách nhãn ['0','1',...,'A','B',...]
-    img: ảnh ký tự (numpy array, dạng xám hoặc nhị phân)
-    """
     if img is None or img.size == 0:
-        print("⚠️ Ảnh đầu vào rỗng hoặc lỗi.")
+        print(" Ảnh đầu vào rỗng hoặc lỗi.")
         return None
 
     # Nếu ảnh có 3 kênh → chuyển sang grayscale

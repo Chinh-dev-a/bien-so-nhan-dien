@@ -3,7 +3,7 @@ import os
 from tensorflow.keras.models import load_model
 
 from test import timbienso        # Hàm phát hiện vùng biển số (trả về ảnh biển số + check)
-from tachkytu import tachkytu     # Hàm tách ký tự
+from tachkytu1 import tachkytu     # Hàm tách ký tự
 from testread import docbien      # Hàm đọc ký tự và ghép chuỗi biển số
 
 
@@ -40,10 +40,6 @@ def main():
 
     model = load_model(MODEL_PATH)
     print("✅ Mô hình đã tải thành công!")
-
-    # ================================
-    # 5️⃣ Phát hiện biển số
-    # ================================
     bienso, check = timbienso(frame, plate_cascade)
 
     if not check:
@@ -52,25 +48,14 @@ def main():
         cv2.waitKey(0)
         return
 
-    # ================================
-    # 6️⃣ Tách ký tự
-    # ================================
     kytu = tachkytu(bienso)
-
-    # ================================
-    # 7️⃣ Nhận dạng từng ký tự
-    # ================================
     plate_number = ""
     for i, char_img in enumerate(kytu):
         label = docbien(model, class_labels, char_img)
         plate_number += label
         print(f"Ký tự {i + 1}: {label}")
 
-    print("🚗 Biển số nhận dạng:", plate_number)
-
-    # ================================
-    # 8️⃣ Hiển thị kết quả
-    # ================================
+    print(" Biển số nhận dạng:", plate_number)
     cv2.putText(frame, plate_number, (20, 50),
                 cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 255), 3, cv2.LINE_AA)
 

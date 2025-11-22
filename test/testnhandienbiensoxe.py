@@ -515,45 +515,38 @@
 #
 # cv2.waitKey(0)
 
+import os
 import cv2
 import numpy as np
+from tensorflow.keras.models import load_model
 
-# ================================
-# 1️⃣ Đọc ảnh và chuyển sang xám
-# ================================
-img = cv2.imread('bienso/databienso/803_plate1.jpg')
-img= cv2.resize(img,(400,250),interpolation=cv2.INTER_CUBIC)
-orig = img.copy()
-gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+def docbien(model, class_labels):
+    TEST_FOLDER = "kytucut"
 
-# ================================
-# 2️⃣ Giảm nhiễu bằng Gaussian Blur
-# ================================
-blur = cv2.GaussianBlur(gray, (5, 5), 1.4)
+    def predict_char(image_path):
+        img = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+        if img is None:
+            print(f"⚠️ Không đọc được ảnh: {image_path}")
+            return None
 
+        IMG_SIZE = (32, 32)
+        img_resized = cv2.resize(img, IMG_SIZE)
+        img_resized = cv2.bitwise_not(img_resized)
+        img_input = img_resized.astype("float32") / 255.0
+        img_input = np.expand_dims(img_input, axis=(0, -1))
+        pred = model.predict(img_input, verbose=0)
+        pred_idx = np.argmax(pred, axis=1)[0]
+        label = class_labels[pred_idx]
+        return label
 
-# ================================
-# 3️⃣ Phát hiện biên bằng Canny
-# ================================
-edges = cv2.Canny(blur, 50, 150)
-kernel = np.ones((5,5),np.uint8)
-dilation = cv2.dilate(edges,kernel,iterations = 3)
+    filenames = sorted(os.listdir(TEST_FOLDER))
+    results = []
+    for filename in filenames:
+        if filename.lower().endswith(('.jpg', '.png', '.jpeg')):
+            path = os.path.join(TEST_FOLDER, filename)
+            label = predict_char(path)
+            if label is not None:
+                results.append((filename, label))
 
-# Làm rõ vùng biên bằng phép giãn và co
-kernel = np.ones((3, 3), np.uint8)
-edges = cv2.dilate(edges, kernel, iterations=3)
-edges = cv2.erode(edges, kernel, iterations=1)
-
-# ================================
-# 4️⃣ Tìm contour
-# ================================
-contours, _ = cv2.findContours(edges.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-# ================================
-# 8️⃣ Hiển thị kết quả
-# ================================
-cv2.imshow("1. Anh goc", img)
-cv2.imshow("2. Bien canny", edges)
-cv2.imshow("3. Khung tu giac tim duoc", orig)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+    plate_number = ''.join([label for _, label in results])
+    return plate_number
