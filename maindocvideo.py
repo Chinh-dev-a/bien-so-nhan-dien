@@ -16,10 +16,10 @@ def docbien(model, char_img, class_labels):
     # 3. Invert để giống lúc bạn train (trắng = nét)
     img_resized = cv2.bitwise_not(img_resized)
 
-    # 4. Normalized
+    # 4. chuan hoa chuyen qua anh den trang
     img_input = img_resized.astype("float32") / 255.0
 
-    # 5. Expand cho đúng shape (1, 32, 32, 1)
+    # 5. dua anh dau vao cho đúng shape (1, 32, 32, 1)
     img_input = np.expand_dims(img_input, axis=(0, -1))
 
     # 6. Predict
@@ -44,7 +44,7 @@ def timbienso(image, plate_cascade):
 
     # Chỉ xử lý biển số đầu tiên được tìm thấy (nếu có nhiều biển số)
     for (x, y, w, h) in plates:
-        cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        cv2.rectangle(image, (x-5, y-5), (x + w+5, y + h+5), (0, 255, 0), 2)
         cv2.putText(image, "BIEN SO XE", (x, y - 10),
                     cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
@@ -65,7 +65,7 @@ def main():
 
     class_labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
                     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
-                    'K', 'L', 'M', 'N', 'P', 'R', 'T',
+                    'K', 'L', 'M', 'N', 'P', 'R','S', 'T',
                     'U', 'V', 'X', 'Y']
 
     # Tải mô hình CNN

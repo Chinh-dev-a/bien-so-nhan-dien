@@ -3,6 +3,31 @@ import numpy as np
 from tensorflow.keras.models import load_model
 from tachkytu import tachkytu
 
+def timbienso(image, plate_cascade):
+    #Phát hiện biển số trong khung hình (frame) bằng HaarCascade.
+    # Chuyển đổi sang ảnh grayscale để phát hiện
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    plates = plate_cascade.detectMultiScale(
+        gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30)
+    )
+
+    # Khởi tạo mặc định
+    plate_crop = None
+    check = False
+
+    # Chỉ xử lý biển số đầu tiên được tìm thấy (nếu có nhiều biển số)
+    for (x, y, w, h) in plates:
+        cv2.rectangle(image, (x-5, y-5), (x + w+5, y + h+5), (0, 255, 0), 2)
+        cv2.putText(image, "BIEN SO XE", (x, y - 10),
+                    cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+
+        # Cắt vùng chứa biển số
+        plate_crop = image[y:y + h, x:x + w]
+        check = True
+        break  # Phát hiện và xử lý biển số đầu tiên, sau đó thoát khỏi vòng lặp
+    cv2.imshow('anh bien so da cat',image);
+    return plate_crop, check
+
 def docbien(model, char_img, class_labels):
     # 1. Nếu ảnh đang là BGR → convert sang GRAY
     if len(char_img.shape) == 3:
@@ -31,32 +56,6 @@ def docbien(model, char_img, class_labels):
     return class_labels[pred_idx]
 
 
-def timbienso(image, plate_cascade):
-    #Phát hiện biển số trong khung hình (frame) bằng HaarCascade.
-    # Chuyển đổi sang ảnh grayscale để phát hiện
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    plates = plate_cascade.detectMultiScale(
-        gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30)
-    )
-
-    # Khởi tạo mặc định
-    plate_crop = None
-    check = False
-
-    # Chỉ xử lý biển số đầu tiên được tìm thấy (nếu có nhiều biển số)
-    for (x, y, w, h) in plates:
-        cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
-        cv2.putText(image, "BIEN SO XE", (x, y - 10),
-                    cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-
-        # Cắt vùng chứa biển số
-        plate_crop = image[y:y + h, x:x + w]
-        check = True
-        break  # Phát hiện và xử lý biển số đầu tiên, sau đó thoát khỏi vòng lặp
-
-    return plate_crop, check
-
-
 def main():
     # Tải bộ phân loại Haar Cascade để phát hiện biển số
     plate_cascade = cv2.CascadeClassifier('cascade2.xml')
@@ -66,7 +65,7 @@ def main():
     # Các nhãn ký tự được sử dụng trong quá trình huấn luyện mô hình
     class_labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
                     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
-                    'K', 'L', 'M', 'N', 'P', 'R', 'T',
+                    'K', 'L', 'M', 'N', 'P', 'R', 'S','T',
                     'U', 'V', 'X', 'Y']
 
     # Tải mô hình nhận diện ký tự
