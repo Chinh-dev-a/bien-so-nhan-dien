@@ -66,7 +66,7 @@ os.makedirs("models", exist_ok=True)
 MODEL_PATH = "models/char_cnn_model.h5"
 model.save(MODEL_PATH)
 
-print(f"\n✅ Đã lưu mô hình tại: {MODEL_PATH}")
+print(f"\n Đã lưu mô hình tại: {MODEL_PATH}")
 # 6️. IN CLASS INDEX
 class_indices = train_gen.class_indices
 print("\nSố lớp:", train_gen.num_classes)
