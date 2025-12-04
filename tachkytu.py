@@ -7,7 +7,7 @@ def tachkytu(img):
     img_result = img.copy()
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)#chuyen anh sang xam
     cv2.imshow('xam ',gray)
-    # Giảm nhiễu bằng phương pháp lọc song phương
+    # Giảm nhiễu bằng phương pháp lọc song phương dung de khu nhieu nho
     noise_removal = cv2.bilateralFilter(gray, 12, 30, 30)
     # cv2.imshow('khu nhieu',noise_removal)
     # cân bằng histogram
